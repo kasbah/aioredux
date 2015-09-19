@@ -2,8 +2,9 @@ import asyncio
 import enum
 import logging
 
+import toolz
+
 import aioredux
-from pyrsistent import pmap, pvector  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +26,16 @@ def complete_todo(index):
 
 
 # initial state
-initial_state = pmap({
-    'todos': pvector([])
-})
+initial_state = {
+    'todos': ()
+}
 
 
 # reducers
 def todo_app(state, action):
     if action['type'] == ActionTypes.ADD_TODO:
-        todos = state['todos'].append(action['text'])
-        return state.update({'todos': todos})
+        todos = state['todos'] + (action['text'],)
+        return toolz.assoc(state, 'todos', todos)
     else:
         return state
 

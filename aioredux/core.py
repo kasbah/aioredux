@@ -1,7 +1,5 @@
 import enum
 
-from pyrsistent import pmap
-
 
 class ActionTypes(enum.Enum):
     INIT = '@@redux/INIT'
@@ -14,7 +12,7 @@ class Store:
         if not callable(reducer):
             raise ValueError('Expected the reducer to be callable.')
         self.reducer = reducer
-        self._state = pmap() if initial_state is None else initial_state
+        self._state = {} if initial_state is None else initial_state
         self.listeners = set()
         self.is_dispatching = False
 
