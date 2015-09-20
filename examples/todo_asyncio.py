@@ -5,11 +5,13 @@ import logging
 import toolz
 
 import aioredux
+import aioredux.middleware
 
 logger = logging.getLogger(__name__)
 
 
 # action types
+@enum.unique
 class ActionTypes(enum.Enum):
     ADD_TODO = 1
     REMOVE_TODO = 2
@@ -23,6 +25,16 @@ def add_todo(text):
 
 def complete_todo(index):
     return {'type': ActionTypes.COMPLETE_TODO, 'index': index}
+
+
+def add_todo_slow():
+    @asyncio.coroutine
+    def thunk(dispatch, state_func=None):
+        yield from asyncio.sleep(0.1)
+        dispatch(add_todo('do task z1 (from coroutine)'))
+        yield from asyncio.sleep(0.1)
+        dispatch(add_todo('do task z2 (from coroutine)'))
+    return thunk
 
 
 # initial state
@@ -45,12 +57,17 @@ def todo_app(state, action):
 
 @asyncio.coroutine
 def run():
-    store = aioredux.Store(todo_app, initial_state)
+    thunk_middleware = aioredux.middleware.thunk_middleware
+    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.Store)
+    store = create_store_with_middleware(todo_app, initial_state)
+
     store.subscribe(lambda: logging.info("new state: {}".format(store.state)))
+    store.dispatch(add_todo_slow())
     for i in range(5):
         store.dispatch(add_todo('do task {}'.format(i)))
     store.dispatch(complete_todo(1))
     store.dispatch(complete_todo(2))
+    yield from asyncio.sleep(0.5)
     logging.info('Finished')
 
 if __name__ == '__main__':
