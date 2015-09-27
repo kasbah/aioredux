@@ -5,7 +5,7 @@ import aioredux
 
 def apply_middleware(*middlewares):
     def next_func(next):
-        def create_store(reducer, initial_state):
+        def create_store(reducer, initial_state=None):
             store = aioredux.Store(reducer, initial_state)
             dispatch = store.dispatch
             middleware_api = dict(dispatch=dispatch, state_func=lambda: store.state)
