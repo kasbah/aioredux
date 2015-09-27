@@ -27,7 +27,7 @@ def is_FSA(action):
     '''Checks whether `action` is a Flux Standard Action (FSA).'''
     if not is_mapping(action):
         return False
-    if not 'type' in action:
+    if 'type' not in action:
         return False
     properties = {'type', 'action', 'payload', 'error', 'meta'}
     if len(action.keys() - properties) > 0:
