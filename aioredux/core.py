@@ -1,5 +1,7 @@
 import enum
 
+import aioredux.utils
+
 
 class ActionTypes(enum.Enum):
     INIT = '@@redux/INIT'
@@ -43,6 +45,8 @@ class Store:
 
     def dispatch(self, action):
         '''Dispatch an action.'''
+        if not aioredux.utils.is_mapping(action):
+            return ValueError('Actions must be mappings.')
         if self.is_dispatching:
             return RuntimeError('Reducers may not dispatch actions.')
         try:

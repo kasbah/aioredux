@@ -1,3 +1,5 @@
+import collections.abc
+
 import toolz
 
 import aioredux
@@ -14,3 +16,22 @@ def apply_middleware(*middlewares):
             return store
         return create_store
     return next_func
+
+
+def is_mapping(action):
+    '''Analogous to isPlainObject'''
+    return isinstance(action, collections.abc.Mapping)
+
+
+def is_FSA(action):
+    '''Checks whether `action` is a Flux Standard Action (FSA).'''
+    if not is_mapping(action):
+        return False
+    if not 'type' in action:
+        return False
+    properties = {'type', 'action', 'payload', 'error', 'meta'}
+    if len(action.keys() - properties) > 0:
+        return False
+    if not is_mapping(action.get('payload', {})):
+        return False
+    return True
