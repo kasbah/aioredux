@@ -7,10 +7,10 @@ def thunk_middleware(dispatch, state_func, loop=None):
             if callable(action):
                 if asyncio.iscoroutinefunction(action):
                     # asyncio.async renamed to asyncio.ensure_future in py>=3.4.4
-                    asyncio.async(action(dispatch, state_func), loop=loop)
+                    return asyncio.async(action(dispatch, state_func), loop=loop)
                 else:
-                    action(dispatch, state_func)
+                    return action(dispatch, state_func)
             else:
-                next(action)
+                return next(action)
         return action_func
     return next_func
