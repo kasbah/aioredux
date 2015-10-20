@@ -2,8 +2,8 @@ import toolz
 
 import aioredux
 import aioredux.middleware
-import aioredux.utils
 from aioredux.tests import base
+import aioredux.utils
 
 
 class TestThunk(base.TestCase):
@@ -45,8 +45,8 @@ class TestThunk(base.TestCase):
 
         def add_todo_complex():
             def thunk(dispatch, state_func):
-               dispatch({'type': 'ADD_TODO', 'text': 'todo text'})
-               return 19
+                dispatch({'type': 'ADD_TODO', 'text': 'todo text'})
+                return 19
             return thunk
 
         def reducer(state, action):

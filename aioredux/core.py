@@ -1,5 +1,3 @@
-import enum
-
 import aioredux.utils
 
 

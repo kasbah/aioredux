@@ -5,8 +5,8 @@ import toolz
 
 import aioredux
 import aioredux.middleware
-import aioredux.utils
 from aioredux.tests import base
+import aioredux.utils
 
 
 class TestThunkAsync(base.TestCase):
