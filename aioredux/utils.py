@@ -35,3 +35,27 @@ def is_FSA(action):
     if not is_mapping(action.get('payload', {})):
         return False
     return True
+
+
+def combine_reducers(reducers):
+    assert all(callable(val) for val in reducers.values())
+    default_state = {k: None for k in reducers}
+
+    def combination(state=None, action=None):
+        if state is None:
+            state = default_state
+        has_changed = False
+
+        def next_state(key, reducer):
+            nonlocal has_changed
+            previous_state_for_key = state[key]
+            next_state_for_key = reducer(previous_state_for_key, action)
+            if next_state_for_key is None:
+                msg = ('`None` is not an allowed initial state when using `combine_reducers`. '
+                       '`None` is used to indicate a malfunctioning reducer initialization.')
+                raise ValueError(msg)
+            has_changed |= next_state_for_key != previous_state_for_key
+            return next_state_for_key
+        final_state = {key: next_state(key, reducer) for key, reducer in reducers.items()}
+        return final_state if has_changed else state
+    return combination

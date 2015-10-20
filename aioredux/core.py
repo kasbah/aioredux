@@ -3,7 +3,7 @@ import enum
 import aioredux.utils
 
 
-class ActionTypes(enum.Enum):
+class ActionTypes:
     INIT = '@@redux/INIT'
 
 
