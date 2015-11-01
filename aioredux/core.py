@@ -1,3 +1,5 @@
+import asyncio
+
 import aioredux.utils
 
 
@@ -8,16 +10,15 @@ class ActionTypes:
 class Store:
     '''Creates a store which holds the state tree.'''
 
-    def __init__(self, reducer, initial_state=None):
+    def __init__(self, reducer, initial_state=None, loop=None):
+        '''Do not call directly, use create_store'''
         if not callable(reducer):
             raise ValueError('Expected the reducer to be callable.')
         self.reducer = reducer
         self._state = initial_state
         self.listeners = set()
         self.is_dispatching = False
-
-        # dispatch an 'INIT' action so every reducer returns initial state
-        self.dispatch({'type': ActionTypes.INIT})
+        self.loop = loop
 
     @property
     def state(self):
@@ -37,10 +38,12 @@ class Store:
 
         return unsubscribe
 
+    @asyncio.coroutine
     def replace_reducer(self, next_reducer):
         self.reducer = next_reducer
-        self.dispatch({'type': ActionTypes.INIT})
+        yield from self.dispatch({'type': ActionTypes.INIT})
 
+    @asyncio.coroutine
     def dispatch(self, action):
         '''Dispatch an action.'''
         if not aioredux.utils.is_mapping(action):
@@ -57,4 +60,14 @@ class Store:
             self._state = next_state
             for listener in self.listeners:
                 listener()
-        return action
+        future = asyncio.Future(loop=self.loop)
+        future.set_result(action)
+        return future
+
+
+@asyncio.coroutine
+def create_store(*args, **kwargs):
+    store = Store(*args, **kwargs)
+    # dispatch an 'INIT' action so every reducer returns initial state
+    yield from store.dispatch({'type': ActionTypes.INIT})
+    return store
