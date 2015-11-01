@@ -47,9 +47,11 @@ class Store:
     def dispatch(self, action):
         '''Dispatch an action.'''
         if not aioredux.utils.is_mapping(action):
-            return ValueError('Actions must be mappings.')
+            if action is None:
+                raise ValueError('Actions must be mappings, got `None`. Did you mean to return a thunk?')
+            raise ValueError('Actions must be mappings, got: {}'.format(action))
         if self.is_dispatching:
-            return RuntimeError('Reducers may not dispatch actions.')
+            raise RuntimeError('Reducers may not dispatch actions.')
         try:
             self.is_dispatching = True
             next_state = self.reducer(self.state, action)
