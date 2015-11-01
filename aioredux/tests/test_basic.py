@@ -1,3 +1,5 @@
+import asyncio
+
 import toolz
 
 import aioredux
@@ -6,33 +8,53 @@ from aioredux.tests import base
 
 class TestAioredux(base.TestCase):
 
+    def setUp(self):
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(None)
+        super().setUp()
+
+    def tearDown(self):
+        self.loop.close()
+        self.loop = None
+        super().tearDown()
+
     def test_todo(self):
-        initial_state = {
-            'todos': (),
-        }
-        store = aioredux.Store(lambda state, action: state, initial_state)
-        self.assertIsNotNone(store)
-        self.assertIsNotNone(store.state)
+
+        @asyncio.coroutine
+        def go():
+            initial_state = {
+                'todos': (),
+            }
+            store = yield from aioredux.create_store(lambda state, action: state, initial_state, loop=self.loop)
+            self.assertIsNotNone(store)
+            self.assertIsNotNone(store.state)
+
+        self.loop.run_until_complete(go())
 
     def test_todo_reducer(self):
-        initial_state = {
-            'todos': (),
-        }
 
-        def add_todo(text):
-            return {'type': 'ADD_TODO', 'text': text}
+        @asyncio.coroutine
+        def go():
+            initial_state = {
+                'todos': (),
+            }
 
-        def reducer(state, action):
-            if action['type'] == 'ADD_TODO':
-                todos = state['todos'] + (action['text'],)
-                return toolz.assoc(state, 'todos', todos)
-            return state
+            def add_todo(text):
+                return {'type': 'ADD_TODO', 'text': text}
 
-        store = aioredux.Store(reducer, initial_state)
-        self.assertIsNotNone(store.state)
-        self.assertIsNotNone(store.state['todos'])
-        self.assertEqual(len(store.state['todos']), 0)
-        store.dispatch(add_todo('todo text'))
-        self.assertIsNotNone(store.state)
-        self.assertIsNotNone(store.state['todos'])
-        self.assertEqual(len(store.state['todos']), 1)
+            def reducer(state, action):
+                if action['type'] == 'ADD_TODO':
+                    todos = state['todos'] + (action['text'],)
+                    return toolz.assoc(state, 'todos', todos)
+                return state
+
+            store = yield from aioredux.create_store(reducer, initial_state, loop=self.loop)
+            self.assertIsNotNone(store.state)
+            self.assertIsNotNone(store.state['todos'])
+            self.assertEqual(len(store.state['todos']), 0)
+            yield from store.dispatch(add_todo('todo text'))
+            self.assertIsNotNone(store.state)
+            self.assertIsNotNone(store.state['todos'])
+            self.assertEqual(len(store.state['todos']), 1)
+
+        self.loop.run_until_complete(go())
