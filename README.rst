@@ -2,6 +2,8 @@
 aioredux
 ========
 
+|pypi| |travis| |downloads|
+
 Pythonic `Redux <https://github.com/rackt/redux>`_
 
 Pythonic `Redux <https://github.com/rackt/redux>`_ using asyncio. ``aioredux``
@@ -41,3 +43,16 @@ Implementation notes
 - ``dispatch`` is a marked as ``async`` although in most cases it functions like
   a plain Python function returning a Future. This is done to allow for cases
   where dispatch performs a more complicated set of (async) actions.
+
+
+.. |pypi| image:: https://badge.fury.io/py/aioredux.png
+    :target: https://badge.fury.io/py/aioredux
+    :alt: pypi version
+
+.. |travis| image:: https://travis-ci.org/stan-dev/aioredux.png?branch=master
+    :target: https://travis-ci.org/stan-dev/aioredux
+    :alt: travis-ci build status
+
+.. |downloads| image:: https://img.shields.io/pypi/dm/aioredux.svg
+    :target: https://pypi.python.org/pypi/aioredux
+    :alt: pypi download statistics
