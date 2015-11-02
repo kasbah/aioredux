@@ -4,12 +4,12 @@ import toolz
 
 
 def apply_middleware(*middlewares):
-    def next_func(next_):
+    def next_func(next_handler):
         # next_ is typically aioredux.create_store
         def create_store(reducer, initial_state=None):
-            store = yield from next_(reducer, initial_state)
+            store = yield from next_handler(reducer, initial_state)
             dispatch = store.dispatch
-            middleware_api = dict(dispatch=dispatch, state_func=lambda: store.state)
+            middleware_api = dict(dispatch=lambda action: store.dispatch(action), state_func=lambda: store.state)
             chain = map(lambda middleware: middleware(**middleware_api), middlewares)
             store.dispatch = toolz.compose(*chain)(dispatch)
             return store
