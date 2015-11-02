@@ -110,6 +110,7 @@ class TestThunk(base.TestCase):
             def add_todo_slow():
                 @asyncio.coroutine
                 def thunk(dispatch, state_func):
+                    yield from asyncio.sleep(0.01, loop=self.loop)
                     yield from dispatch(add_todo('slow todo'))
                 return thunk
 
@@ -131,7 +132,7 @@ class TestThunk(base.TestCase):
             self.assertEqual(len(store.state['todos']), 1)
 
             yield from store.dispatch(add_todo_slow())
-            yield from asyncio.sleep(0.01, loop=self.loop)
+            yield from asyncio.sleep(0.02, loop=self.loop)
             self.assertIsNotNone(store.state)
             self.assertEqual(len(store.state['todos']), 2)
 
