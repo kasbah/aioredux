@@ -6,7 +6,7 @@ import aioredux
 from aioredux.tests import base
 
 
-class TestAioredux(base.TestCase):
+class TestBasic(base.TestCase):
 
     def setUp(self):
         self.loop = asyncio.new_event_loop()
@@ -56,5 +56,21 @@ class TestAioredux(base.TestCase):
             self.assertIsNotNone(store.state)
             self.assertIsNotNone(store.state['todos'])
             self.assertEqual(len(store.state['todos']), 1)
+
+        self.loop.run_until_complete(go())
+
+    def test_subscribe(self):
+
+        @asyncio.coroutine
+        def go():
+            initial_state = {
+                'todos': (),
+            }
+            store = yield from aioredux.create_store(lambda state, action: state, initial_state, loop=self.loop)
+            self.assertEqual(len(store.listeners), 0)
+            unsubscribe = store.subscribe(lambda: None)
+            self.assertEqual(len(store.listeners), 1)
+            unsubscribe()
+            self.assertEqual(len(store.listeners), 0)
 
         self.loop.run_until_complete(go())
