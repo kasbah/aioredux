@@ -31,8 +31,6 @@ def is_FSA(action):
     properties = {'type', 'action', 'payload', 'error', 'meta'}
     if len(action.keys() - properties) > 0:
         return False
-    if not is_mapping(action.get('payload', {})):
-        return False
     return True
 
 
