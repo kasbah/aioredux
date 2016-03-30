@@ -20,7 +20,10 @@ Usage
 -----
 ::
 
-    @asyncio.coroutine()
+   import asyncio
+   import aioredux
+
+    @asyncio.coroutine
     def go():
         initial_state = {
             'todos': (),
@@ -37,7 +40,7 @@ Usage
 
         store = yield from aioredux.create_store(reducer, initial_state)
         yield from store.dispatch(add_todo('todo text'))
-        print(store.state['todos')
+        print(store.state['todos'])
 
     asyncio.get_event_loop().run_until_complete(go())
 
