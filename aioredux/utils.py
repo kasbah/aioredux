@@ -51,7 +51,7 @@ def combine_reducers(reducers):
                 msg = ('`None` is not an allowed initial state when using `combine_reducers`. '
                        '`None` is used to indicate a malfunctioning reducer initialization.')
                 raise ValueError(msg)
-            has_changed |= next_state_for_key != previous_state_for_key
+            has_changed |= next_state_for_key is not previous_state_for_key
             return next_state_for_key
         final_state = {key: next_state(key, reducer) for key, reducer in reducers.items()}
         return final_state if has_changed else state

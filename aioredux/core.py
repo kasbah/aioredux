@@ -58,7 +58,7 @@ class Store:
         finally:
             self.is_dispatching = False
         # If no change in state, do not notify subscribers
-        if next_state != self.state:
+        if next_state is not self.state:
             self._state = next_state
             for listener in self.listeners:
                 listener()
