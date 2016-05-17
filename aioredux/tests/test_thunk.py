@@ -8,6 +8,11 @@ import aioredux.middleware
 from aioredux.tests import base
 import aioredux.utils
 
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
+
 
 class TestThunk(base.TestCase):
 
@@ -23,7 +28,7 @@ class TestThunk(base.TestCase):
 
     def test_todo_thunk(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),
@@ -45,7 +50,7 @@ class TestThunk(base.TestCase):
             self.assertIsNotNone(store.state['todos'])
             self.assertEqual(len(store.state['todos']), 0)
 
-            @asyncio.coroutine
+            @coroutine
             def thunk(dispatch, state_func):
                 yield from dispatch(add_todo('todo text'))
 
@@ -58,7 +63,7 @@ class TestThunk(base.TestCase):
 
     def test_todo_thunk_return_value(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),
@@ -68,7 +73,7 @@ class TestThunk(base.TestCase):
                 return {'type': 'ADD_TODO', 'text': text}
 
             def add_todo_complex():
-                @asyncio.coroutine
+                @coroutine
                 def thunk(dispatch, state_func):
                     yield from dispatch({'type': 'ADD_TODO', 'text': 'todo text'})
                     return 19
@@ -98,7 +103,7 @@ class TestThunk(base.TestCase):
 
     def test_todo_thunk_async(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),
@@ -108,7 +113,7 @@ class TestThunk(base.TestCase):
                 return {'type': 'ADD_TODO', 'text': text}
 
             def add_todo_slow():
-                @asyncio.coroutine
+                @coroutine
                 def thunk(dispatch, state_func):
                     yield from asyncio.sleep(0.01, loop=self.loop)
                     yield from dispatch(add_todo('slow todo'))

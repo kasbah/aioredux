@@ -8,6 +8,11 @@ import aioredux.middleware
 from aioredux.tests import base
 import aioredux.utils
 
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
+
 
 class TestThunkNested(base.TestCase):
 
@@ -23,7 +28,7 @@ class TestThunkNested(base.TestCase):
 
     def test_todo_thunk_nested(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),
@@ -33,14 +38,14 @@ class TestThunkNested(base.TestCase):
                 return {'type': 'ADD_TODO', 'text': text}
 
             def add_todo_thunk_nested():
-                @asyncio.coroutine
+                @coroutine
                 def thunk(dispatch, state_func):
                     yield from dispatch({'type': 'ADD_TODO', 'text': 'todo text'})
                     return 5
                 return thunk
 
             def add_todo_thunk():
-                @asyncio.coroutine
+                @coroutine
                 def thunk(dispatch, state_func):
                     yield from dispatch(add_todo_thunk_nested())
                     return 3

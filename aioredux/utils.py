@@ -2,10 +2,16 @@ import collections.abc
 
 import toolz
 
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
+
 
 def apply_middleware(*middlewares):
     def next_func(next_handler):
         # next_ is typically aioredux.create_store
+        @coroutine
         def create_store(reducer, initial_state=None):
             store = yield from next_handler(reducer, initial_state)
             dispatch = store.dispatch

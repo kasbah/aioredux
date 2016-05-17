@@ -5,6 +5,11 @@ import toolz
 import aioredux
 from aioredux.tests import base
 
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
+
 
 class TestBasic(base.TestCase):
 
@@ -20,7 +25,7 @@ class TestBasic(base.TestCase):
 
     def test_todo(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),
@@ -33,7 +38,7 @@ class TestBasic(base.TestCase):
 
     def test_todo_reducer(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),
@@ -61,7 +66,7 @@ class TestBasic(base.TestCase):
 
     def test_subscribe(self):
 
-        @asyncio.coroutine
+        @coroutine
         def go():
             initial_state = {
                 'todos': (),

@@ -1,6 +1,7 @@
 import asyncio
 import enum
 import logging
+import types
 
 import toolz
 
@@ -43,7 +44,7 @@ def todo_app(state, action):
         return state
 
 
-@asyncio.coroutine
+@types.coroutine
 def run():
     store = aioredux.Store(todo_app, initial_state)
     store.subscribe(lambda: logging.info("new state: {}".format(store.state)))

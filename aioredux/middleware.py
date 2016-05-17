@@ -7,8 +7,6 @@ def thunk_middleware(dispatch, state_func):
             if asyncio.iscoroutine(action):
                 raise RuntimeError('Expected coroutine function, found coroutine: {}'.format(action))
             if callable(action):
-                if not asyncio.iscoroutinefunction(action):
-                    raise RuntimeError('thunk must be a coroutine function, found callable: {}'.format(action))
                 return action(dispatch, state_func)
             else:
                 return next_handler(action)

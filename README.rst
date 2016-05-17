@@ -23,8 +23,7 @@ Usage
    import asyncio
    import aioredux
 
-    @asyncio.coroutine
-    def go():
+    async def go():
         initial_state = {
             'todos': (),
         }

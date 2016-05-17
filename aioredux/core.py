@@ -2,6 +2,11 @@ import asyncio
 
 import aioredux.utils
 
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
+
 
 class ActionTypes:
     INIT = '@@redux/INIT'
@@ -38,12 +43,12 @@ class Store:
 
         return unsubscribe
 
-    @asyncio.coroutine
+    @coroutine
     def replace_reducer(self, next_reducer):
         self.reducer = next_reducer
         yield from self.dispatch({'type': ActionTypes.INIT})
 
-    @asyncio.coroutine
+    @coroutine
     def dispatch(self, action):
         '''Dispatch an action.'''
         if not aioredux.utils.is_mapping(action):
@@ -67,7 +72,7 @@ class Store:
         return future
 
 
-@asyncio.coroutine
+@coroutine
 def create_store(*args, **kwargs):
     store = Store(*args, **kwargs)
     # dispatch an 'INIT' action so every reducer returns initial state

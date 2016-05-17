@@ -1,6 +1,7 @@
 import asyncio
 import enum
 import logging
+import types
 
 import toolz
 
@@ -56,7 +57,7 @@ def todo_app(state, action):
         return state
 
 
-@asyncio.coroutine
+@types.coroutine
 def run():
     thunk_middleware = aioredux.middleware.thunk_middleware
     create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.Store)
