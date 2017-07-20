@@ -57,11 +57,11 @@ def todo_app(state, action):
         return state
 
 
-@types.coroutine
+@asyncio.coroutine
 def run():
     thunk_middleware = aioredux.middleware.thunk_middleware
-    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.Store)
-    store = create_store_with_middleware(todo_app, initial_state)
+    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.core.Store)
+    store = yield from create_store_with_middleware(todo_app, initial_state)
 
     store.subscribe(lambda: logging.info("new state: {}".format(store.state)))
     store.dispatch(fetch_todo())
