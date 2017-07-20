@@ -2,8 +2,12 @@ import asyncio
 import enum
 import logging
 import types
-
 import toolz
+
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
 
 import aioredux
 import aioredux.middleware
@@ -57,10 +61,10 @@ def todo_app(state, action):
         return state
 
 
-@asyncio.coroutine
+@coroutine
 def run():
     thunk_middleware = aioredux.middleware.thunk_middleware
-    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.core.Store)
+    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.create_store)
     store = yield from create_store_with_middleware(todo_app, initial_state)
 
     store.subscribe(lambda: logging.info("new state: {}".format(store.state)))
