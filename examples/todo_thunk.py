@@ -70,9 +70,9 @@ def run():
     store.subscribe(lambda: logging.info("new state: {}".format(store.state)))
     store.dispatch(fetch_todo())
     for i in range(5):
-        store.dispatch(add_todo('do task {}'.format(i)))
-    store.dispatch(complete_todo(1))
-    store.dispatch(complete_todo(2))
+        yield from store.dispatch(add_todo('do task {}'.format(i)))
+    yield from store.dispatch(complete_todo(1))
+    yield from store.dispatch(complete_todo(2))
     logging.info('Finished')
 
 if __name__ == '__main__':
