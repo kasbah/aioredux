@@ -2,8 +2,12 @@ import asyncio
 import enum
 import logging
 import types
-
 import toolz
+
+try:
+    from types import coroutine
+except ImportError:
+    from asyncio import coroutine
 
 import aioredux
 import aioredux.middleware
@@ -34,8 +38,9 @@ def fetch_todo():
 
     See https://rackt.github.io/redux/docs/advanced/AsyncActions.html
     '''
+    @coroutine
     def thunk(dispatch, state_func=None):
-        dispatch(add_todo('do task x (from thunk)'))
+        yield from dispatch(add_todo('do task x (from thunk)'))
     return thunk
 
 
@@ -57,18 +62,18 @@ def todo_app(state, action):
         return state
 
 
-@types.coroutine
+@coroutine
 def run():
     thunk_middleware = aioredux.middleware.thunk_middleware
-    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.Store)
-    store = create_store_with_middleware(todo_app, initial_state)
+    create_store_with_middleware = aioredux.apply_middleware(thunk_middleware)(aioredux.create_store)
+    store = yield from create_store_with_middleware(todo_app, initial_state)
 
     store.subscribe(lambda: logging.info("new state: {}".format(store.state)))
-    store.dispatch(fetch_todo())
+    yield from store.dispatch(fetch_todo())
     for i in range(5):
-        store.dispatch(add_todo('do task {}'.format(i)))
-    store.dispatch(complete_todo(1))
-    store.dispatch(complete_todo(2))
+        yield from store.dispatch(add_todo('do task {}'.format(i)))
+    yield from store.dispatch(complete_todo(1))
+    yield from store.dispatch(complete_todo(2))
     logging.info('Finished')
 
 if __name__ == '__main__':
