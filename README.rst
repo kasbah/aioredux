@@ -1,5 +1,3 @@
-**NOT MAINTAINED**
-
 ========
 aioredux
 ========
